@@ -31,12 +31,10 @@ dependencies:
   flutter:
     sdk: flutter
   
-  # Firebase paketleri geçici olarak kaldırıldı
+  # Firebase paketleri
   firebase_core: ^2.24.0
-  # firebase_auth: ^4.15.0
-  # cloud_firestore: ^4.13.3
-  
-  # ... diğer paketler66
+  firebase_auth: ^4.15.0
+  cloud_firestore: ^4.13.3
 
 dev_dependencies:
   flutter_test:

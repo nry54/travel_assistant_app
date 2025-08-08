@@ -1,14 +1,14 @@
 plugins {
     id("com.android.application")
-    id("com.google.gms.google-services") // Bu satırı ekle
     kotlin("android")
     id("dev.flutter.flutter-gradle-plugin")
+    // id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.example.travel_assistant_app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -44,6 +44,6 @@ flutter {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    // implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     // Diğer dependency'ler...
 }

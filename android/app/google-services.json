@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:787725089561:android:e51b8d3d494846026d2388",
         "android_client_info": {
-          "package_name": "dev.flutter.a11yassessments"
+          "package_name": "com.example.travel_assistant_app"
         }
       },
       "oauth_client": [],

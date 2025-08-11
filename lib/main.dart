@@ -5,19 +5,22 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Firebase geçici olarak devre dışı bırakıldı
+  bool firebaseReady = false;
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    firebaseReady = true;
   } catch (e) {
     debugPrint('Firebase başlatılırken bir hata oluştu: $e');
   }
-  runApp(const TravelAssistantApp());
+  runApp(TravelAssistantApp(firebaseReady: firebaseReady));
 }
 
 class TravelAssistantApp extends StatelessWidget {
-  const TravelAssistantApp({super.key});
+  const TravelAssistantApp({super.key, required this.firebaseReady});
+
+  final bool firebaseReady;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +30,35 @@ class TravelAssistantApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const AuthScreen(),
+      home: firebaseReady
+          ? const AuthScreen()
+          : const _UnsupportedFirebaseScreen(),
+    );
+  }
+}
+
+class _UnsupportedFirebaseScreen extends StatelessWidget {
+  const _UnsupportedFirebaseScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.info_outline, size: 48),
+              SizedBox(height: 16),
+              Text(
+                'Bu platformda Firebase yapılandırılmadı.\nLütfen Android üzerinde çalıştırın veya Firebase yapılandırmasını bu platform için ekleyin.',
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

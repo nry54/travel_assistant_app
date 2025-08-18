@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_screen.dart';
 import 'firebase_options.dart';
+import 'travels_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,8 +13,11 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     firebaseReady = true;
+  } on FirebaseException catch (e) {
+    print('Firebase Hata Kodu: ${e.code}');
+    print('Firebase Hata Mesajı: ${e.message}');
   } catch (e) {
-    debugPrint('Firebase başlatılırken bir hata oluştu: $e');
+    print('Firebase başlatma hatası: $e');
   }
   runApp(TravelAssistantApp(firebaseReady: firebaseReady));
 }
@@ -30,9 +35,23 @@ class TravelAssistantApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: firebaseReady
-          ? const AuthScreen()
-          : const _UnsupportedFirebaseScreen(),
+
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Veri beklenirken bir yüklenme ekranı gösterilebilir
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasData) {
+            // Eğer oturum açıksa, ana sayfa ekranını göster
+            return const TravelsScreen();
+          }
+          return firebaseReady
+              ? const AuthScreen() // Eğer oturum kapalıysa, giriş/kayıt ekranını göster
+              : const _UnsupportedFirebaseScreen();
+        },
+      ),
     );
   }
 }

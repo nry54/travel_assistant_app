@@ -60,6 +60,7 @@ class TravelsScreen extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (ctx) => TravelDetailsScreen(
                           travelData: travelData.data() as Map<String, dynamic>,
+                          travelId: travelData.id, // Add the missing travelId parameter
                         ),
                       ),
                     );

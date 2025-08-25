@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'add_travel_screen.dart';
 
 class TravelsScreen extends StatelessWidget {
   const TravelsScreen({super.key});
@@ -20,6 +21,14 @@ class TravelsScreen extends StatelessWidget {
         ],
       ),
       body: const Center(child: Text('Seyahatlerin burada listelenecek!')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (ctx) => const AddTravelScreen()));
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

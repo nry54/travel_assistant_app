@@ -79,7 +79,64 @@ class TravelDetailsScreen extends StatelessWidget {
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
                       final taskData = snapshot.data!.docs[index];
-                      return ListTile(title: Text(taskData['taskName']));
+                      return ListTile(
+                        leading: IconButton(
+                          icon: Icon(
+                            taskData['isCompleted']
+                                ? Icons.check_circle
+                                : Icons.circle_outlined,
+                            color: taskData['isCompleted']
+                                ? Colors.green
+                                : Colors.grey,
+                          ),
+                          onPressed: () {
+                            // Firestore'daki görevi güncelleme
+                            FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(user.uid)
+                                .collection('travels')
+                                .doc(travelId)
+                                .collection('tasks')
+                                .doc(taskData.id)
+                                .update({
+                                  'isCompleted': !taskData['isCompleted'],
+                                });
+                          },
+                        ),
+                        title: Text(
+                          taskData['taskName'],
+                          style: TextStyle(
+                            decoration: taskData['isCompleted']
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
+                          ),
+                        ),
+                        // Silme butonu
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () async {
+                            final user = FirebaseAuth.instance.currentUser;
+                            if (user == null) return;
+
+                            try {
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(user.uid)
+                                  .collection('travels')
+                                  .doc(travelId)
+                                  .collection('tasks')
+                                  .doc(taskData.id) // Belirli görevi seç ve sil
+                                  .delete();
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Hata: ${e.toString()}'),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      );
                     },
                   );
                 },

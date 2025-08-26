@@ -13,6 +13,7 @@ class _AddTravelScreenState extends State<AddTravelScreen> {
   final _formKey = GlobalKey<FormState>();
   final _travelNameController = TextEditingController();
   final _destinationController = TextEditingController();
+  final _budgetController = TextEditingController();
 
   DateTime? _startDate;
   DateTime? _endDate;
@@ -21,6 +22,7 @@ class _AddTravelScreenState extends State<AddTravelScreen> {
   void dispose() {
     _travelNameController.dispose();
     _destinationController.dispose();
+    _budgetController.dispose();
     super.dispose();
   }
 
@@ -78,6 +80,7 @@ class _AddTravelScreenState extends State<AddTravelScreen> {
           .add({
             'travelName': _travelNameController.text,
             'destination': _destinationController.text,
+            'budget': int.parse(_budgetController.text),
             'startDate': _startDate!.toIso8601String(),
             'endDate': _endDate!.toIso8601String(),
             'createdAt': Timestamp.now(),
@@ -122,6 +125,25 @@ class _AddTravelScreenState extends State<AddTravelScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Lütfen gidilecek yeri girin.';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _budgetController,
+                decoration: const InputDecoration(
+                  labelText: 'Seyahat Bütçesi',
+                  prefixText: '₺ ',
+                ),
+                keyboardType:
+                    TextInputType.number, // Sadece sayısal klavye açar
+                validator: (value) {
+                  if (value == null ||
+                      value.isEmpty ||
+                      int.tryParse(value) == null) {
+                    return 'Lütfen geçerli bir bütçe girin.';
                   }
                   return null;
                 },

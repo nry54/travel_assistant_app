@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'add_task_screen.dart';
+import 'add_expense_screen.dart';
 
 String _formatDate(String dateString) {
   final dateTime = DateTime.parse(dateString);
@@ -41,7 +42,21 @@ class TravelDetailsScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(travelData['travelName'])),
+      appBar: AppBar(
+        title: Text(travelData['travelName']),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.wallet, color: Colors.white),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => AddExpenseScreen(travelId: travelId),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -80,7 +95,7 @@ class TravelDetailsScreen extends StatelessWidget {
               'Yapılacaklar Listesi:',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
+
             Expanded(
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
@@ -173,6 +188,54 @@ class TravelDetailsScreen extends StatelessWidget {
                   );
                 },
               ),
+            ),
+
+            const Text(
+              'Bütçe Durumu:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(user!.uid)
+                  .collection('travels')
+                  .doc(travelId)
+                  .collection('expenses')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                int totalSpent = snapshot.data!.docs.fold(
+                  0,
+                  (sum, doc) => sum + doc['amount'] as int,
+                );
+                int totalBudget = travelData['budget'] as int;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Toplam Bütçe: ₺$totalBudget',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Harcanan: ₺$totalSpent',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 8),
+                    LinearProgressIndicator(
+                      value: totalSpent / totalBudget,
+                      backgroundColor: Colors.grey[300],
+                      color: Colors.blue,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                );
+              },
             ),
           ],
         ),

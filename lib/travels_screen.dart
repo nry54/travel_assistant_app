@@ -60,13 +60,48 @@ class TravelsScreen extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (ctx) => TravelDetailsScreen(
                           travelData: travelData.data() as Map<String, dynamic>,
-                          travelId: travelData.id, // Add the missing travelId parameter
+                          travelId: travelData
+                              .id, // Add the missing travelId parameter
                         ),
                       ),
                     );
                   },
                   title: Text(travelData['travelName']),
                   subtitle: Text(travelData['destination']),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () async {
+                      final user = FirebaseAuth.instance.currentUser;
+                      if (user == null) return;
+
+                      try {
+                        // 1. Seyahatin altındaki tüm görevleri sil
+                        final tasks = await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user.uid)
+                            .collection('travels')
+                            .doc(travelData.id)
+                            .collection('tasks')
+                            .get();
+
+                        for (var doc in tasks.docs) {
+                          await doc.reference.delete();
+                        }
+
+                        // 2. Ana seyahat belgesini sil
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user.uid)
+                            .collection('travels')
+                            .doc(travelData.id)
+                            .delete();
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Hata: ${e.toString()}')),
+                        );
+                      }
+                    },
+                  ),
                 ),
               );
             },

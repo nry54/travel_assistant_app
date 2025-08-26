@@ -32,8 +32,27 @@ class TravelAssistantApp extends StatelessWidget {
     return MaterialApp(
       title: 'Seyahat Asistanı',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 78, 190, 226), // Turkuaz tonu
+        ),
         useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color.fromARGB(255, 78, 190, 226),
+          foregroundColor: Colors.white,
+        ),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Color.fromARGB(255, 78, 190, 226),
+          foregroundColor: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color.fromARGB(255, 78, 190, 226),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+          ),
+        ),
       ),
 
       home: StreamBuilder(

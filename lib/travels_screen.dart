@@ -7,6 +7,25 @@ import 'travel_details_screen.dart';
 class TravelsScreen extends StatelessWidget {
   const TravelsScreen({super.key});
 
+  String _formatDate(String dateString) {
+    final dateTime = DateTime.parse(dateString);
+    final months = [
+      'Ocak',
+      'Şubat',
+      'Mart',
+      'Nisan',
+      'Mayıs',
+      'Haziran',
+      'Temmuz',
+      'Ağustos',
+      'Eylül',
+      'Ekim',
+      'Kasım',
+      'Aralık',
+    ];
+    return '${dateTime.day} ${months[dateTime.month - 1]} ${dateTime.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     // Geçerli kullanıcıyı alıyoruz
@@ -53,29 +72,59 @@ class TravelsScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final travelData = snapshot.data!.docs[index];
               return Card(
+                elevation: 4.0, // Kartlara gölge ekler
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    15.0,
+                  ), // Köşeleri yuvarlar
+                ),
                 child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 16,
+                  ),
+                  leading: const CircleAvatar(
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                    child: Icon(
+                      Icons.flight,
+                      color: Color.fromARGB(255, 78, 190, 226),
+                    ),
+                  ),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (ctx) => TravelDetailsScreen(
                           travelData: travelData.data() as Map<String, dynamic>,
-                          travelId: travelData
-                              .id, // Add the missing travelId parameter
+                          travelId: travelData.id,
                         ),
                       ),
                     );
                   },
-                  title: Text(travelData['travelName']),
-                  subtitle: Text(travelData['destination']),
+                  title: Text(
+                    travelData['travelName'],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(travelData['destination']),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${_formatDate(travelData['startDate'])} - ${_formatDate(travelData['endDate'])}',
+                        style: const TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () async {
                       final user = FirebaseAuth.instance.currentUser;
                       if (user == null) return;
-
                       try {
-                        // 1. Seyahatin altındaki tüm görevleri sil
                         final tasks = await FirebaseFirestore.instance
                             .collection('users')
                             .doc(user.uid)
@@ -88,7 +137,6 @@ class TravelsScreen extends StatelessWidget {
                           await doc.reference.delete();
                         }
 
-                        // 2. Ana seyahat belgesini sil
                         await FirebaseFirestore.instance
                             .collection('users')
                             .doc(user.uid)

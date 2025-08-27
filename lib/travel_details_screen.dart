@@ -192,7 +192,7 @@ class _TravelDetailsScreenState extends State<TravelDetailsScreen> {
 
             const SizedBox(height: 24),
             const Text(
-              'Yapılacaklar Listesi:',
+              'Yapılacaklar Listesi',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
@@ -291,7 +291,7 @@ class _TravelDetailsScreenState extends State<TravelDetailsScreen> {
             ),
 
             const Text(
-              'Bütçe Durumu:',
+              'Bütçe Durumu',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),

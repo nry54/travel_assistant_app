@@ -1,68 +1,88 @@
 # travel_assistant_app
 
-A new Flutter project.   
-## Overview
+## Genel Bakış
 
-**travel_assistant_app** is a Flutter application designed to help users manage and track their travels. With this app, you can add new trips, specify destinations, select travel dates, and view a list of your journeys. The app also features user authentication for secure access.
+**travel_assistant_app**, seyahat planlama, bütçe yönetimi ve görev takibini tek bir yerde toplayan bir Flutter uygulamasıdır. Yeni seyahatler oluşturabilir, destinasyon ve tarih belirleyebilir, bütçe planı yapabilir, masrafları takip edebilir ve seyahatle ilgili görevlerinizi yönetebilirsiniz. Uygulama, güvenli erişim için kullanıcı kimlik doğrulaması (Firebase Auth) kullanır. Gidilecek yer için anlık hava durumunu görebileceğiniz entegrasyon mevcuttur.
 
-## Features
+## Özellikler
 
-- User authentication (login/logout)
-- Add new travel plans with destination and date selection
-- View a list of your saved travels
-- Simple and intuitive user interface
+- **Kimlik Doğrulama**: E-posta/şifre ile giriş/çıkış
+- **Seyahat Yönetimi**: Seyahat Adı, Gidilecek Yer, Başlangıç/Bitiş Tarihi
+- **Bütçe Planlama**: Seyahat bazında toplam bütçe belirleme
+- **Masraf Takibi**
+- **Görev Yönetimi**: “Vize başvurusu”, “Otel rezervasyonu” gibi yapılacaklar listesi; tamamlandı/aktif durumları
+- **Hava Durumu**: Destinasyona özel anlık hava durumu sorgulama
+- **Basit ve Sezgisel Arayüz**
 
-## Screenshots
+## Ekran Görüntüleri
 
-*(Add screenshots of your app here)*
+![Giriş](android/docs/screenshots/giris_ekrani.png) 
+![Seyahat Listesi](android/docs/screenshots/seyahat_listesi.png)
+![Seyahat Ekle-1](android/docs/screenshots/seyahat_ekleme_1.png)
+![Seyahat Ekle-Gidilecek Yer Combobox](android/docs/screenshots/seyahat_ekleme_2.png)
+![Seyahat Detayı](android/docs/screenshots/seyahat_detay.png)
+![Harcama Ekleme](android/docs/screenshots/harcama_ekle.png)
+![Görev Ekleme](android/docs/screenshots/gorev_ekle.png)
 
-## How to Use
+Ekran görüntüsü alma önerileri:
 
-1. **Login:**  
-   Use your email and password to log in.  
-   Example credentials:  
+- iOS Simülatör: Command + S (veya Menü: File → Save Screen Shot)
+- Android Emulator: “Take screenshot” aracı (sağ panel) veya `adb exec-out screencap -p > shot.png`
+- Fiziksel cihaz: Yerleşik ekran görüntüsü kısayolları; dosyaları `docs/screenshots/` içine taşıyın
+
+## KurulumHa
+
+1. Depoyu klonlayın.
+2. Bağımlılıkları kurun: `flutter pub get`
+3. Firebase yapılandırmasını tamamlayın (iOS/Android için `google-services` dosyaları ekli):
+   - Android: `android/app/google-services.json`
+   - iOS: `ios/Runner/GoogleService-Info.plist` (yoksa Firebase konsolundan indirin)
+4. Uygulamayı başlatın: `flutter run`
+
+## Yapılandırma
+
+- Hava durumu servisi için `lib/weather_service.dart` kullanılır.
+
+## Kullanım Akışları
+
+1. **Giriş Yap**  
+   E-posta/şifrenizle giriş yapın.
+   
+   Örnek Giriş Bilgileri:  
    - **User Name:** nuray54@gmail.com  
    - **Password:** sntrk5417
 
-2. **Add a Travel:**  
-   - Tap the button to add a new travel.
-   - Enter the travel name and destination.
-   - Select the start and end dates.
-   - Save your travel plan.
+2. **Seyahat Oluştur**  
+   Seyahat adı - Gidilecek Yer - Seyahat Bütçesi - Başlangıç Tarihi - Bitiş Tarihi bilgileri girilerek seyahat oluşturabilirsiniz.
 
-3. **View Travels:**  
-   - Your saved travels will be listed on the main screen.
+3. **Bütçe Planla**  
+   Seyahat için toplam bütçeyi seyahat oluşturma aşamasında girilir (örn. 15.000 TRY). Bütçe ilerlemesi detay ekranında çubuk/renk ile gösterilir.
 
-## Requirements
+4. **Harcama Ekle**  
+   Gezi detayında sağ üst köşedeki simgeye tıklanır. Harcama Başlığı ve Miktar girilir. Masraflar arka planda toplanarak bütçeden düşülecektir ve seyahat detayında bütçe durumunu göreceksiniz.
 
-- Flutter SDK
-- Firebase account (for authentication)
+5. **Görevleri Yönet**  
+   Seyahat detayında Yapılacaklar listenizi oluşturun (örn. “Araç kiralama”), işaretleyerek tamamlayın.
 
-## Getting Started
+6. **Hava Durumunu Gör**  
+   Gidilecek yer için anlık hava durumu bilgisini görüntüleyin.
 
-1. Clone this repository.
-2. Run `flutter pub get` to install dependencies.
-3. Set up Firebase for your project (see [Firebase setup guide](https://firebase.flutter.dev/docs/overview)).
-4. Run the app on your emulator or device with `flutter run`.
+## Teknik Notlar
 
-## Contributing
+- Flutter ve Firebase entegrasyonu mevcuttur (kimlik doğrulama). Gerektiğinde Cloud Firestore/Realtime Database ile kalıcı veri eklenebilir.
+- Durum yönetimi ve veri katmanı ihtiyaçlarına göre genişletilebilir (Provider, Riverpod, Bloc vb.).
+- Test ve dağıtım süreçleri için GitHub Actions veya benzeri CI/CD akışları eklenebilir.
 
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+## Katkıda Bulunma
 
-## License
+Pull request'ler memnuniyetle karşılanır! Büyük değişiklikler için lütfen önce bir konu (issue) açarak tartışma başlatın.
 
-This project is licensed under the MIT License.
+## Lisans
 
+Bu proje MIT Lisansı ile lisanslanmıştır.
 
-## Getting Started
+## Kaynaklar
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- [Lab: İlk Flutter uygulamanızı yazın](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Faydalı Flutter örnekleri](https://docs.flutter.dev/cookbook)
+- [Flutter Dokümantasyonu](https://docs.flutter.dev/)

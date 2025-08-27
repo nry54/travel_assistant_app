@@ -1,6 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+
+final List<String> _cities = [
+  'İstanbul',
+  'Ankara',
+  'İzmir',
+  'Antalya',
+  'Bursa',
+  'Paris',
+  'Londra',
+  'Roma',
+  'New York',
+  'Tokyo',
+];
 
 class AddTravelScreen extends StatefulWidget {
   const AddTravelScreen({super.key});
@@ -119,14 +133,47 @@ class _AddTravelScreenState extends State<AddTravelScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _destinationController,
-                decoration: const InputDecoration(labelText: 'Gidilecek Yer'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Lütfen gidilecek yeri girin.';
-                  }
-                  return null;
+              TypeAheadField<String>(
+                builder: (context, controller, focusNode) {
+                  // Mevcut controller ile senkronize et
+                  controller.text = _destinationController.text;
+                  controller.selection = TextSelection.fromPosition(
+                    TextPosition(offset: controller.text.length),
+                  );
+                  return TextFormField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    decoration: const InputDecoration(
+                      labelText: 'Gidilecek Yer',
+                    ),
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          !_cities.contains(value)) {
+                        return 'Lütfen geçerli bir şehir seçin.';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      _destinationController.text = value;
+                    },
+                  );
+                },
+                suggestionsCallback: (pattern) {
+                  return _cities
+                      .where(
+                        (city) =>
+                            city.toLowerCase().contains(pattern.toLowerCase()),
+                      )
+                      .toList();
+                },
+                itemBuilder: (context, suggestion) {
+                  return ListTile(title: Text(suggestion));
+                },
+                onSelected: (suggestion) {
+                  setState(() {
+                    _destinationController.text = suggestion;
+                  });
                 },
               ),
 

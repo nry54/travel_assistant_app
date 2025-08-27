@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'add_task_screen.dart';
 import 'add_expense_screen.dart';
+import 'weather_service.dart';
 
 String _formatDate(String dateString) {
   final dateTime = DateTime.parse(dateString);
@@ -23,15 +24,53 @@ String _formatDate(String dateString) {
   return '${dateTime.day} ${months[dateTime.month - 1]} ${dateTime.year}';
 }
 
-class TravelDetailsScreen extends StatelessWidget {
+class TravelDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> travelData;
-  final String travelId; // travelId'yi alabilmek için bu özelliği ekledik
+  final String travelId;
 
   const TravelDetailsScreen({
     super.key,
     required this.travelData,
     required this.travelId,
   });
+
+  @override
+  State<TravelDetailsScreen> createState() => _TravelDetailsScreenState();
+}
+
+class _TravelDetailsScreenState extends State<TravelDetailsScreen> {
+  final WeatherService _weatherService = WeatherService(
+    '877c3a7460a3959f6d70de97b67899e0',
+  );
+  Map<String, dynamic>? _weatherData;
+  bool _isLoadingWeather = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchWeather();
+  }
+
+  void _fetchWeather() async {
+    setState(() {
+      _isLoadingWeather = true;
+    });
+
+    try {
+      final data = await _weatherService.getWeather(
+        widget.travelData['destination'],
+      );
+      setState(() {
+        _weatherData = data;
+      });
+    } catch (e) {
+      print('Hava durumu verisi çekilirken bir hata oluştu: $e');
+    } finally {
+      setState(() {
+        _isLoadingWeather = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,14 +82,14 @@ class TravelDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(travelData['travelName']),
+        title: Text(widget.travelData['travelName']),
         actions: [
           IconButton(
             icon: const Icon(Icons.wallet, color: Colors.white),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (ctx) => AddExpenseScreen(travelId: travelId),
+                  builder: (ctx) => AddExpenseScreen(travelId: widget.travelId),
                 ),
               );
             },
@@ -70,7 +109,7 @@ class TravelDetailsScreen extends StatelessWidget {
 
             const Icon(Icons.location_on, color: Colors.blue),
             Text(
-              'Gidilecek Yer: ${travelData['destination']}',
+              'Gidilecek Yer: ${widget.travelData['destination']}',
               style: const TextStyle(fontSize: 16),
             ),
 
@@ -78,7 +117,7 @@ class TravelDetailsScreen extends StatelessWidget {
             const Icon(Icons.calendar_today, color: Colors.blue),
             const SizedBox(height: 8),
             Text(
-              'Başlangıç Tarihi: ${_formatDate(travelData['startDate'])}',
+              'Başlangıç Tarihi: ${_formatDate(widget.travelData['startDate'])}',
               style: const TextStyle(fontSize: 16),
             ),
 
@@ -86,10 +125,71 @@ class TravelDetailsScreen extends StatelessWidget {
             const Icon(Icons.calendar_today, color: Colors.blue),
             const SizedBox(height: 8),
             Text(
-              'Bitiş Tarihi: ${_formatDate(travelData['endDate'])}',
+              'Bitiş Tarihi: ${_formatDate(widget.travelData['endDate'])}',
               style: const TextStyle(fontSize: 16),
+            ),
+
+            const SizedBox(height: 24),
+            const Text(
+              'Hava Durumu',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
+            if (_isLoadingWeather)
+              const Center(child: CircularProgressIndicator())
+            else if (_weatherData != null)
+              Card(
+                elevation: 4.0,
+                margin: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      // Hava durumu ikonu
+                      Image.network(
+                        'http://openweathermap.org/img/wn/${_weatherData!['weather'][0]['icon']}@2x.png',
+                        width: 50,
+                        height: 50,
+                      ),
+                      const SizedBox(width: 16),
+                      // Hava durumu bilgileri
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${_weatherData!['name']}',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Sıcaklık: ${_weatherData!['main']['temp'].round()}°C',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _weatherData!['weather'][0]['description'],
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              const Text(
+                'Hava durumu verisi alınamadı.',
+                style: TextStyle(fontSize: 16),
+              ),
+
             const SizedBox(height: 24),
             const Text(
               'Yapılacaklar Listesi:',
@@ -102,7 +202,7 @@ class TravelDetailsScreen extends StatelessWidget {
                     .collection('users')
                     .doc(user.uid)
                     .collection('travels')
-                    .doc(travelId)
+                    .doc(widget.travelId)
                     .collection('tasks')
                     .orderBy('createdAt', descending: true)
                     .snapshots(),
@@ -140,7 +240,7 @@ class TravelDetailsScreen extends StatelessWidget {
                                   .collection('users')
                                   .doc(user!.uid)
                                   .collection('travels')
-                                  .doc(travelId)
+                                  .doc(widget.travelId)
                                   .collection('tasks')
                                   .doc(taskData.id)
                                   .update({
@@ -167,18 +267,18 @@ class TravelDetailsScreen extends StatelessWidget {
                                     .collection('users')
                                     .doc(user.uid)
                                     .collection('travels')
-                                    .doc(travelId)
+                                    .doc(widget.travelId)
                                     .collection('tasks')
-                                    .doc(
-                                      taskData.id,
-                                    ) // Belirli görevi seç ve sil
+                                    .doc(taskData.id)
                                     .delete();
                               } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Hata: ${e.toString()}'),
-                                  ),
-                                );
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Hata: ${e.toString()}'),
+                                    ),
+                                  );
+                                }
                               }
                             },
                           ),
@@ -200,7 +300,7 @@ class TravelDetailsScreen extends StatelessWidget {
                   .collection('users')
                   .doc(user!.uid)
                   .collection('travels')
-                  .doc(travelId)
+                  .doc(widget.travelId)
                   .collection('expenses')
                   .snapshots(),
               builder: (context, snapshot) {
@@ -212,7 +312,7 @@ class TravelDetailsScreen extends StatelessWidget {
                   0,
                   (sum, doc) => sum + doc['amount'] as int,
                 );
-                int totalBudget = travelData['budget'] as int;
+                int totalBudget = widget.travelData['budget'] as int;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,7 +344,7 @@ class TravelDetailsScreen extends StatelessWidget {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (ctx) => AddTaskScreen(travelId: travelId),
+              builder: (ctx) => AddTaskScreen(travelId: widget.travelId),
             ),
           );
         },

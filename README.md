@@ -16,13 +16,14 @@
 
 ## Ekran Görüntüleri
 
-![Giriş](android/docs/screenshots/giris_ekrani.png) 
-![Seyahat Listesi](android/docs/screenshots/seyahat_listesi.png)
-![Seyahat Ekle-1](android/docs/screenshots/seyahat_ekleme_1.png)
-![Seyahat Ekle-Gidilecek Yer Combobox](android/docs/screenshots/seyahat_ekleme_2.png)
-![Seyahat Detayı](android/docs/screenshots/seyahat_detay.png)
-![Harcama Ekleme](android/docs/screenshots/harcama_ekle.png)
-![Görev Ekleme](android/docs/screenshots/gorev_ekle.png)
+
+<img src="android/docs/screenshots/giris_ekrani.png" alt="Giriş" width="350"/>
+<img src="android/docs/screenshots/seyahat_listesi.png" alt="Seyahat Listesi" width="350"/>
+<img src="android/docs/screenshots/seyahat_ekleme_1.png" alt="Seyahat Ekle-1" width="350"/>
+<img src="android/docs/screenshots/seyahat_ekleme_2.png" alt="Seyahat Ekle-Gidilecek Yer Combobox" width="350"/>
+<img src="android/docs/screenshots/seyahat_detay.png" alt="Seyahat Detayı" width="350"/>
+<img src="android/docs/screenshots/harcama_ekle.png" alt="Harcama Ekleme" width="350"/>
+<img src="android/docs/screenshots/gorev_ekle.png" alt="Görev Ekleme" width="350"/>
 
 Ekran görüntüsü alma önerileri:
 
